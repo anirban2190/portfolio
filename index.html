@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anirban Bhattacharyya — Robotics Software Engineer · ROS 2 Autonomy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E14;
+    --surface:#121821;
+    --surface-2:#161E2A;
+    --line:#1E2A38;
+    --grid:#15202C;
+    --text:#E8EDF2;
+    --muted:#8A97A6;
+    --faint:#5A6675;
+    --cyan:#3DD6D0;      /* free space / lidar return */
+    --violet:#9A6BFF;    /* inflation gradient */
+    --magenta:#E061C8;   /* near-lethal */
+    --amber:#F2B344;
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--cyan);color:var(--bg)}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:2px}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--cyan);display:inline-block;margin-bottom:18px;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,14,20,.78);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--text);font-weight:500}
+  .brand b{color:var(--cyan)}
+  .nav-links{display:flex;gap:26px}
+  .nav-links a{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);transition:color .2s}
+  .nav-links a:hover{color:var(--cyan)}
+  .nav-toggle{display:none;background:none;border:1px solid var(--line);color:var(--text);
+    font-family:'JetBrains Mono',monospace;padding:6px 12px;border-radius:6px;cursor:pointer}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;padding:120px 0 110px;overflow:hidden}
+  .hero-grid{
+    position:absolute;inset:0;z-index:0;
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:38px 38px;
+    mask-image:radial-gradient(ellipse 80% 70% at 60% 35%,#000 0%,transparent 78%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 60% 35%,#000 0%,transparent 78%);
+  }
+  .hero svg.path{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+  .hero-content{position:relative;z-index:2;max-width:720px}
+  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);margin:6px 0 22px}
+  .hero h1 .accent{
+    background:linear-gradient(100deg,var(--cyan),var(--violet) 60%,var(--magenta));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero .lead{font-size:1.2rem;color:var(--muted);max-width:600px;margin-bottom:34px}
+  .hero .lead b{color:var(--text);font-weight:500}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{
+    font-family:'JetBrains Mono',monospace;font-size:.84rem;
+    padding:12px 22px;border-radius:8px;border:1px solid var(--line);
+    transition:all .2s;cursor:pointer;display:inline-flex;align-items:center;gap:9px;
+  }
+  .btn-primary{background:var(--cyan);color:var(--bg);border-color:var(--cyan);font-weight:600}
+  .btn-primary:hover{background:transparent;color:var(--cyan)}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+
+  /* ---------- TELEMETRY STRIP ---------- */
+  .telemetry{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+  .telemetry-inner{display:grid;grid-template-columns:repeat(4,1fr)}
+  .tcell{padding:26px 28px;border-right:1px solid var(--line)}
+  .tcell:last-child{border-right:none}
+  .tcell .k{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .tcell .v{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;color:var(--text);font-weight:500}
+  .tcell .v .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);
+    margin-right:8px;box-shadow:0 0 8px var(--cyan);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:88px 0;border-bottom:1px solid var(--line)}
+  .sec-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan);margin-bottom:14px}
+  .sec-title{font-size:clamp(1.7rem,4vw,2.5rem);margin-bottom:38px}
+  .lede{font-size:1.1rem;color:var(--muted);max-width:680px}
+  .lede b{color:var(--text);font-weight:500}
+
+  /* ABOUT */
+  .about-grid{display:grid;grid-template-columns:240px 1fr;gap:48px;align-items:start}
+  .photo-frame{
+    position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;margin:0;
+    border:1px solid var(--line);background:#000;
+  }
+  .photo-frame::before{
+    content:"images/nav_demo.gif";position:absolute;inset:0;display:flex;
+    align-items:center;justify-content:center;padding:16px;text-align:center;
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--faint);
+    background:
+      repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 10px,var(--surface) 10px,var(--surface) 20px);
+  }
+  .photo-frame img{position:relative;width:100%;height:100%;object-fit:cover;display:block}
+  .photo-frame img:not([src]),.photo-frame img.missing{display:none}
+  .photo-frame figcaption{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text);
+    background:linear-gradient(transparent,rgba(10,14,20,.88))}
+  .photo-frame figcaption b{color:var(--cyan)}
+  .about-body p{margin-bottom:16px;color:var(--muted)}
+  .about-body p b{color:var(--text);font-weight:500}
+
+  /* EXPERIENCE / TIMELINE */
+  .job{display:grid;grid-template-columns:200px 1fr;gap:34px;padding:30px 0;border-top:1px solid var(--line)}
+  .job:first-of-type{border-top:none;padding-top:0}
+  .job .meta .role{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan);margin-bottom:6px}
+  .job .meta .org{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600}
+  .job .meta .when{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--faint);margin-top:4px}
+  .job h3{font-size:1.25rem;margin-bottom:12px}
+  .job ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .job li{position:relative;padding-left:20px;color:var(--muted);font-size:.96rem}
+  .job li::before{content:"›";position:absolute;left:0;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+  .job li b{color:var(--text);font-weight:500}
+
+  /* PROJECTS / SUBSYSTEMS */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:26px;
+    transition:border-color .25s,transform .25s;position:relative;overflow:hidden;
+  }
+  .card::after{content:"";position:absolute;top:0;left:0;width:100%;height:2px;
+    background:linear-gradient(90deg,var(--cyan),var(--violet));transform:scaleX(0);
+    transform-origin:left;transition:transform .3s}
+  .card:hover{border-color:var(--line);transform:translateY(-3px)}
+  .card:hover::after{transform:scaleX(1)}
+  .card .tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--faint);margin-bottom:12px;letter-spacing:.08em}
+  .card h3{font-size:1.15rem;margin-bottom:10px}
+  .card p{color:var(--muted);font-size:.92rem}
+  .card p b{color:var(--text);font-weight:500}
+
+  /* SKILLS */
+  .skill-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .skill-group h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan);
+    text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text);
+    background:var(--surface);border:1px solid var(--line);padding:6px 12px;border-radius:6px}
+
+  /* EDUCATION */
+  .edu{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:baseline}
+  .edu .when{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan)}
+  .edu h3{font-size:1.2rem;margin-bottom:6px}
+  .edu p{color:var(--muted)}
+
+  /* DEMOS */
+  .featured-demo{position:relative;border-radius:14px;overflow:hidden;margin:0 0 16px;
+    border:1px solid var(--line);background:#000;aspect-ratio:16/9}
+  .featured-demo video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  .demo-cap{position:absolute;left:0;right:0;top:0;padding:12px 16px;pointer-events:none;
+    font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--text);
+    background:linear-gradient(rgba(10,14,20,.9),transparent)}
+  .demo-cap b{color:var(--cyan)}
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  figure.shot{position:relative;aspect-ratio:16/10;border-radius:10px;overflow:hidden;
+    border:1px solid var(--line);background:#000;margin:0}
+  figure.shot video,figure.shot img{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  figure.shot img.missing,figure.shot video.missing{display:none}
+  figure.shot .demo-cap{font-size:.68rem;padding:9px 12px}
+
+  /* CONTACT */
+  .contact{text-align:center;border-bottom:none}
+  .contact h2{font-size:clamp(2rem,5vw,3rem);margin-bottom:20px}
+  .contact .lede{margin:0 auto 34px}
+  .contact-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  footer{padding:30px 0;text-align:center;font-family:'JetBrains Mono',monospace;
+    font-size:.74rem;color:var(--faint)}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:820px){
+    .telemetry-inner{grid-template-columns:repeat(2,1fr)}
+    .tcell:nth-child(2){border-right:none}
+    .tcell{border-bottom:1px solid var(--line)}
+    .about-grid,.job,.edu{grid-template-columns:1fr;gap:18px}
+    .cards,.skill-cols{grid-template-columns:1fr}
+    .gallery{grid-template-columns:1fr}
+    .nav-links{display:none}
+    .nav-links.open{display:flex;position:absolute;top:60px;left:0;right:0;
+      flex-direction:column;background:var(--surface);border-bottom:1px solid var(--line);
+      padding:18px 28px;gap:16px}
+    .nav-toggle{display:block}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto}
+    svg.path .trace{stroke-dashoffset:0!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">anirban<b>@</b>autonomy:~$</div>
+    <nav class="nav-links" id="navlinks">
+      <a href="#about">/about</a>
+      <a href="#experience">/experience</a>
+      <a href="#work">/work</a>
+      <a href="#skills">/skills</a>
+      <a href="#demos">/demos</a>
+      <a href="#contact">/contact</a>
+    </nav>
+    <button class="nav-toggle" id="navtoggle" aria-label="Toggle menu">menu</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <svg class="path" viewBox="0 0 1080 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="pgrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3DD6D0"/>
+        <stop offset="0.6" stop-color="#9A6BFF"/>
+        <stop offset="1" stop-color="#E061C8"/>
+      </linearGradient>
+    </defs>
+    <path class="trace" d="M -40 520 C 180 480 240 300 420 300 S 640 360 760 240 S 980 120 1120 150"
+          fill="none" stroke="url(#pgrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <g class="waypoints">
+      <circle cx="420" cy="300" r="5" fill="#0A0E14" stroke="#3DD6D0" stroke-width="2"/>
+      <circle cx="760" cy="240" r="5" fill="#0A0E14" stroke="#9A6BFF" stroke-width="2"/>
+    </g>
+    <g class="robot">
+      <circle r="9" fill="#0A0E14" stroke="#E061C8" stroke-width="2.5"/>
+      <line x1="0" y1="0" x2="13" y2="0" stroke="#E061C8" stroke-width="2.5"/>
+    </g>
+  </svg>
+
+  <div class="wrap">
+    <div class="hero-content">
+      <span class="eyebrow">// ros 2 · nav2 · slam · sensor fusion</span>
+      <h1>Robotics software<br>engineer building<br><span class="accent">field autonomy.</span></h1>
+      <p class="lead">I'm <b>Anirban Bhattacharyya</b> — sole software owner of a full ROS 2 autonomy stack
+        for an agricultural autonomous mobile robot. I take robots from
+        <b>raw LiDAR and CAN bus</b> to <b>localizing, planning, and navigating</b> in the real world.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#contact">Get in touch →</a>
+        <a class="btn btn-ghost" href="#work">See the stack</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TELEMETRY -->
+<div class="telemetry">
+  <div class="wrap"><div class="telemetry-inner">
+    <div class="tcell"><div class="k">Status</div><div class="v"><span class="dot"></span>Open to roles</div></div>
+    <div class="tcell"><div class="k">Base</div><div class="v">Barcelona, ES</div></div>
+    <div class="tcell"><div class="k">Core stack</div><div class="v">ROS 2 / Nav2 / C++17</div></div>
+    <div class="tcell"><div class="k">Languages</div><div class="v">EN C2 · FR B1</div></div>
+  </div></div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-label">/about</div>
+    <h2 class="sec-title">From sensors to motion, end to end</h2>
+    <div class="about-grid">
+      <figure class="photo-frame">
+        <img src="images/nav_demo.gif" alt="Autonomous navigation demo" onerror="this.classList.add('missing')">
+        <figcaption><b>nav_demo</b> · autonomy, live</figcaption>
+      </figure>
+      <div class="about-body">
+        <p>I'm a robotics software engineer focused on <b>navigation and autonomy</b>. On my
+          current platform I own the entire software side: localization, mapping, motion planning,
+          control, and the low-level bus that talks to the hardware.</p>
+        <p>That means I live across the whole stack — tuning <b>AMCL and EKF sensor fusion</b> so a
+          robot knows where it is, configuring <b>Nav2</b> so it plans paths that don't clip
+          corridors, and dropping down to <b>SocketCAN / CANopen</b> when the motor controllers
+          misbehave. I prefer fixing the root cause over papering it with parameters.</p>
+        <p>I hold an <b>M.Sc in Advanced Mechatronics</b> and work comfortably from
+          embedded firmware (UART, SPI, I2C, GPIO) up to behavior trees and Dockerized deployment.
+          Currently exploring roles across Europe and the UAE.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-label">/experience</div>
+    <h2 class="sec-title">Where I've shipped</h2>
+
+    <div class="job">
+      <div class="meta">
+        <div class="role">Robotics Software Engineer</div>
+        <div class="org">Mecàniques Segalés</div>
+        <div class="when">Barcelona · present</div>
+      </div>
+      <div>
+        <h3>Sole owner — ROS 2 autonomy stack, agricultural AMR</h3>
+        <ul>
+          <li>Designed and maintain the <b>full Nav2 navigation stack</b>: costmaps, planners, controllers, recovery behaviors, and behavior trees.</li>
+          <li>Built <b>EKF sensor fusion</b> (robot_localization) and tuned AMCL to eliminate localization drift in a structured field environment.</li>
+          <li>Integrated a <b>Livox Mid-360 LiDAR</b> end to end — URDF, transforms, point-cloud-to-laserscan, QoS, and intensity-based retroreflector localization experiments.</li>
+          <li>Wrote the <b>CAN / CANopen</b> interface over SocketCAN to drive motor controllers, and diagnosed encoder, odometry, and gain-tuning issues at the firmware level.</li>
+          <li>Containerized the stack with <b>Docker</b> for reproducible deployment on the robot.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK / SUBSYSTEMS -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-label">/work</div>
+    <h2 class="sec-title">The autonomy stack, by subsystem</h2>
+    <p class="lede" style="margin-bottom:34px">Each block below is a problem I've owned on a real robot in the field — not a tutorial.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="tag">// localization</div>
+        <h3>Drift-free pose estimation</h3>
+        <p>Diagnosed AMCL using only <b>~2% of available scan beams</b>, fused wheel odometry and IMU through an EKF, and injected fixed initial poses at launch for repeatable startup.</p>
+      </div>
+      <div class="card">
+        <div class="tag">// navigation</div>
+        <h3>Tight-corridor path planning</h3>
+        <p>Resolved failures where the robot's footprint diagonal exceeded corridor width — corrected inflation radius, footprint, and goal-tolerance configs across full <b>Nav2 param rewrites</b>.</p>
+      </div>
+      <div class="card">
+        <div class="tag">// perception</div>
+        <h3>LiDAR integration & SLAM</h3>
+        <p>Fixed point-cloud mirroring from double-applied transforms, repaired <b>slam_toolbox</b> scan matching, and resolved QoS mismatches between perception and Nav2 nodes.</p>
+      </div>
+      <div class="card">
+        <div class="tag">// control & bus</div>
+        <h3>CAN motor control</h3>
+        <p>Built the <b>SocketCAN / CANopen</b> bridge, calibrated odometry against commanded motion, and tuned velocity-controller gains on ODrive Pro controllers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-label">/skills</div>
+    <h2 class="sec-title">Toolbox</h2>
+    <div class="skill-cols">
+      <div class="skill-group">
+        <h4>Autonomy & ROS 2</h4>
+        <div class="chips">
+          <span class="chip">ROS 2</span><span class="chip">Nav2</span><span class="chip">AMCL</span>
+          <span class="chip">SLAM</span><span class="chip">slam_toolbox</span><span class="chip">Behavior Trees</span>
+          <span class="chip">EKF / robot_localization</span><span class="chip">Gazebo</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>Languages & systems</h4>
+        <div class="chips">
+          <span class="chip">C++17</span><span class="chip">Python</span><span class="chip">Linux</span>
+          <span class="chip">Docker</span><span class="chip">Git</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>Hardware & embedded</h4>
+        <div class="chips">
+          <span class="chip">Livox Mid-360</span><span class="chip">CAN / CANopen</span><span class="chip">SocketCAN</span>
+          <span class="chip">UART</span><span class="chip">SPI</span><span class="chip">I2C</span><span class="chip">GPIO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="wrap">
+    <div class="sec-label">/education</div>
+    <h2 class="sec-title">Education</h2>
+    <div class="edu">
+      <div class="when">M.Sc</div>
+      <div>
+        <h3>M.Sc, Advanced Mechatronics</h3>
+        <p>France · robotics, control systems, and embedded engineering.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMOS -->
+<section id="demos">
+  <div class="wrap">
+    <div class="sec-label">/demos</div>
+    <h2 class="sec-title">Demos &amp; field footage</h2>
+    <p class="lede" style="margin-bottom:30px">The robot running for real — navigation, perception, and the hardware underneath.</p>
+
+    <figure class="featured-demo">
+      <video src="images/field_trial.mp4" muted loop playsinline controls preload="metadata"
+             data-autoplay onerror="this.classList.add('missing')"></video>
+      <figcaption class="demo-cap"><b>field_trial</b> · full autonomy run in the field</figcaption>
+    </figure>
+
+    <div class="gallery">
+      <figure class="shot">
+        <video src="images/perception_lidar.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <figcaption class="demo-cap"><b>perception_lidar</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <video src="images/ckt_trial.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <figcaption class="demo-cap"><b>ckt_trial</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <video src="images/ckt_test.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <figcaption class="demo-cap"><b>ckt_test</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <video src="images/WhatsApp%20Video%202026-06-09%20at%2002.05.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <figcaption class="demo-cap"><b>demo</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/Screenshot%20from%202026-02-24%2008-32-19.png" alt="RViz / stack screenshot" onerror="this.classList.add('missing')">
+        <figcaption class="demo-cap"><b>rviz_screenshot</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/soc_battery.jpg" alt="Battery / state-of-charge" onerror="this.classList.add('missing')">
+        <figcaption class="demo-cap"><b>soc_battery</b></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="sec-label" style="display:inline-block">/contact</div>
+    <h2>Let's build something that moves.</h2>
+    <p class="lede">Open to ROS 2 navigation and autonomy roles across Germany, the Netherlands, France, Spain, and the UAE.</p>
+    <div class="contact-links">
+      <a class="btn btn-primary" href="mailto:YOUR_EMAIL@example.com">Email me</a>
+      <a class="btn btn-ghost" href="https://linkedin.com/in/YOUR_HANDLE" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn btn-ghost" href="https://github.com/AnirbanBhattacharyya/portfolio" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© <span id="yr"></span> Anirban Bhattacharyya · built with HTML, CSS &amp; a little JavaScript · hosted on GitHub Pages</div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // mobile menu
+  var toggle = document.getElementById('navtoggle');
+  var links = document.getElementById('navlinks');
+  toggle.addEventListener('click', function(){ links.classList.toggle('open'); });
+  links.addEventListener('click', function(e){ if(e.target.tagName==='A') links.classList.remove('open'); });
+
+  // hero path trace + robot driving along the path
+  (function(){
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var path = document.querySelector('svg.path .trace');
+    var robot = document.querySelector('svg.path .robot');
+    if(!path) return;
+    var len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    if(reduce){ path.style.strokeDashoffset = 0; return; }
+    path.style.strokeDashoffset = len;
+
+    var start = null, dur = 2600;
+    function frame(t){
+      if(!start) start = t;
+      var p = Math.min((t - start) / dur, 1);
+      var eased = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+      path.style.strokeDashoffset = len * (1 - eased);
+      if(robot){
+        var pt = path.getPointAtLength(len * eased);
+        var ahead = path.getPointAtLength(Math.min(len * eased + 1, len));
+        var ang = Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180 / Math.PI;
+        robot.setAttribute('transform','translate('+pt.x+','+pt.y+') rotate('+ang+')');
+      }
+      if(p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // autoplay demo videos marked data-autoplay, unless reduced motion is requested
+  (function(){
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce) return;
+    document.querySelectorAll('video[data-autoplay]').forEach(function(v){
+      v.muted = true;
+      var p = v.play();
+      if(p && p.catch) p.catch(function(){ /* autoplay blocked; controls remain */ });
+    });
+  })();
+</script>
+</body>
+</html>
