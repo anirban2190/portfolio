@@ -391,8 +391,14 @@
       </div>
       <div class="card">
         <div class="tag">// drivers</div>
-        <h3>Driver-level latency</h3>
-        <p>Below ROS, motor controllers talk over the bus, and what matters is the time between a velocity command leaving the controller and torque reaching a wheel. That's a <b>driver latency</b> problem: SocketCAN framing, kernel scheduling, and adapter <b>bind / unbind</b> (e.g. <b>gs_usb</b>) all add delay that shows up as odometry error and control lag. I profile and tighten that path so the control loop stays real-time.</p>
+        <h3>Deterministic control over CAN</h3>
+        <p>The motor's fast loop runs on the controller, so what bites the robot isn't raw command delay — it's <b>jitter on the feedback path</b>. Variable arrival time corrupts the odometry <b>dt</b> (drift you can't blame on the sensors) and eats control phase margin at speed. I attack the variance — RT-friendly scheduling, native CAN over USB adapters, tight loop timing — and timestamp encoder feedback at the source, not at receipt.</p>
+      </div>
+
+      <div class="card">
+        <div class="tag">// safety &amp; integration</div>
+        <h3>Fused multi-LiDAR + PLC safety layer</h3>
+        <p>Concatenated point clouds from multiple LiDARs into one unified <b>360° safety field</b> — calibrated extrinsics, TF-synced and voxel-downsampled — so no single sensor leaves a blind spot. Wired the fused detection into a <b>safety PLC</b> over fieldbus (Modbus / EtherNet-IP / OPC-UA) for deterministic, hardware-level protective stops independent of ROS. The same PLC guards the <b>DC bus</b>, clamping regenerative-braking voltage spikes with a brake-resistor interlock to protect the battery.</p>
       </div>
     </div>
   </div>
@@ -423,7 +429,7 @@
       <div class="skill-group">
         <h4>Hardware &amp; embedded</h4>
         <div class="chips">
-          <span class="chip">Livox Mid-360</span><span class="chip">CAN / CANopen</span><span class="chip">SocketCAN</span>
+          <span class="chip">Livox Mid-360</span><span class="chip">Multi-LiDAR fusion</span><span class="chip">PLC / Modbus</span><span class="chip">CAN / CANopen</span><span class="chip">SocketCAN</span>
           <span class="chip">UART</span><span class="chip">SPI</span><span class="chip">I2C</span><span class="chip">GPIO</span>
         </div>
       </div>
@@ -473,7 +479,7 @@
         <figcaption class="demo-cap"><b>demo</b></figcaption>
       </figure>
       <figure class="shot">
-        <video src="images/field_clip.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <video src="images/WhatsApp%20Video%202026-06-09%20at%2006.09.55.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
         <figcaption class="demo-cap"><b>field_clip</b></figcaption>
       </figure>
       <figure class="shot">
@@ -485,15 +491,15 @@
         <figcaption class="demo-cap"><b>soc_battery</b></figcaption>
       </figure>
       <figure class="shot">
-        <img src="images/field_photo_1.jpeg" alt="Robot in the field" onerror="this.classList.add('missing')">
+        <img src="images/WhatsApp%20Image%202026-06-09%20at%2006.09.55.jpeg" alt="Robot in the field" onerror="this.classList.add('missing')">
         <figcaption class="demo-cap"><b>field_1</b></figcaption>
       </figure>
       <figure class="shot">
-        <img src="images/field_photo_2.jpeg" alt="Robot hardware" onerror="this.classList.add('missing')">
+        <img src="images/WhatsApp%20Image%202026-06-09%20at%2006.09.55%20(1).jpeg" alt="Robot hardware" onerror="this.classList.add('missing')">
         <figcaption class="demo-cap"><b>field_2</b></figcaption>
       </figure>
       <figure class="shot">
-        <img src="images/field_photo_3.jpeg" alt="Robot detail" onerror="this.classList.add('missing')">
+        <img src="images/WhatsApp%20Image%202026-06-09%20at%2006.09.55%20(2).jpeg" alt="Robot detail" onerror="this.classList.add('missing')">
         <figcaption class="demo-cap"><b>field_3</b></figcaption>
       </figure>
     </div>
