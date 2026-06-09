@@ -322,7 +322,7 @@
     <div class="job">
       <div class="meta">
         <div class="role">Robotics Software Engineer</div>
-        <div class="org">Mecàniques Segalés</div>
+        <div class="org">Agricultural Robotics</div>
         <div class="when">Barcelona · present</div>
       </div>
       <div>
@@ -333,6 +333,23 @@
           <li>Integrated a <b>Livox Mid-360 LiDAR</b> end to end — URDF, transforms, point-cloud-to-laserscan, QoS, and intensity-based retroreflector localization experiments.</li>
           <li>Wrote the <b>CAN / CANopen</b> interface over SocketCAN to drive motor controllers, and diagnosed encoder, odometry, and gain-tuning issues at the firmware level.</li>
           <li>Containerized the stack with <b>Docker</b> for reproducible deployment on the robot.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="meta">
+        <div class="role">Robotics R&amp;D — Research Lab</div>
+        <div class="org">Multi-Robot Fleet</div>
+        <div class="when">France · earlier</div>
+      </div>
+      <div>
+        <h3>ROS 2 middleware &amp; fleet coordination, mecanum AMRs</h3>
+        <ul>
+          <li>Built ROS 2 nodes for a <b>fleet of mecanum-wheel AMRs</b>, focused on inter-robot communication and coordination.</li>
+          <li>Modeled and validated <b>forward / inverse kinematics</b> in MATLAB, then verified behavior in Gazebo before hardware.</li>
+          <li>Wrote a Python <b>SocketCAN driver</b> for real-time motor commands, velocity feedback, and fault monitoring.</li>
+          <li>Evaluated <b>DDS vs Fast RTPS</b> middleware for throughput, latency, and message-drop behavior across the fleet network.</li>
         </ul>
       </div>
     </div>
@@ -358,13 +375,24 @@
       </div>
       <div class="card">
         <div class="tag">// perception</div>
-        <h3>LiDAR integration & SLAM</h3>
+        <h3>LiDAR integration &amp; SLAM</h3>
         <p>Fixed point-cloud mirroring from double-applied transforms, repaired <b>slam_toolbox</b> scan matching, and resolved QoS mismatches between perception and Nav2 nodes.</p>
       </div>
       <div class="card">
-        <div class="tag">// control & bus</div>
+        <div class="tag">// control &amp; bus</div>
         <h3>CAN motor control</h3>
         <p>Built the <b>SocketCAN / CANopen</b> bridge, calibrated odometry against commanded motion, and tuned velocity-controller gains on ODrive Pro controllers.</p>
+      </div>
+
+      <div class="card">
+        <div class="tag">// middleware</div>
+        <h3>Fleet communication &amp; DDS</h3>
+        <p>For a multi-robot system, the hard part isn't one robot — it's getting many to agree on state without a central bottleneck. I built the ROS 2 layer on <b>DDS / Fast RTPS</b>, comparing reliability and message-drop thresholds (DDS holding past larger payloads where Fast RTPS degraded earlier) and weighing a <b>centralized fleet-manager</b> topology against fully <b>decentralized</b> coordination where each robot acts on local information alone.</p>
+      </div>
+      <div class="card">
+        <div class="tag">// drivers</div>
+        <h3>Driver-level latency</h3>
+        <p>Below ROS, motor controllers talk over the bus, and what matters is the time between a velocity command leaving the controller and torque reaching a wheel. That's a <b>driver latency</b> problem: SocketCAN framing, kernel scheduling, and adapter <b>bind / unbind</b> (e.g. <b>gs_usb</b>) all add delay that shows up as odometry error and control lag. I profile and tighten that path so the control loop stays real-time.</p>
       </div>
     </div>
   </div>
@@ -377,22 +405,23 @@
     <h2 class="sec-title">Toolbox</h2>
     <div class="skill-cols">
       <div class="skill-group">
-        <h4>Autonomy & ROS 2</h4>
+        <h4>Autonomy &amp; ROS 2</h4>
         <div class="chips">
           <span class="chip">ROS 2</span><span class="chip">Nav2</span><span class="chip">AMCL</span>
           <span class="chip">SLAM</span><span class="chip">slam_toolbox</span><span class="chip">Behavior Trees</span>
           <span class="chip">EKF / robot_localization</span><span class="chip">Gazebo</span>
+          <span class="chip">DDS / Fast RTPS</span>
         </div>
       </div>
       <div class="skill-group">
-        <h4>Languages & systems</h4>
+        <h4>Languages &amp; systems</h4>
         <div class="chips">
           <span class="chip">C++17</span><span class="chip">Python</span><span class="chip">Linux</span>
           <span class="chip">Docker</span><span class="chip">Git</span>
         </div>
       </div>
       <div class="skill-group">
-        <h4>Hardware & embedded</h4>
+        <h4>Hardware &amp; embedded</h4>
         <div class="chips">
           <span class="chip">Livox Mid-360</span><span class="chip">CAN / CANopen</span><span class="chip">SocketCAN</span>
           <span class="chip">UART</span><span class="chip">SPI</span><span class="chip">I2C</span><span class="chip">GPIO</span>
@@ -444,12 +473,28 @@
         <figcaption class="demo-cap"><b>demo</b></figcaption>
       </figure>
       <figure class="shot">
+        <video src="images/field_clip.mp4" controls playsinline preload="metadata" onerror="this.classList.add('missing')"></video>
+        <figcaption class="demo-cap"><b>field_clip</b></figcaption>
+      </figure>
+      <figure class="shot">
         <img src="images/rviz_screenshot.png" alt="RViz / stack screenshot" onerror="this.classList.add('missing')">
-        <figcaption class="demo-cap"><b>tree</b></figcaption>
+        <figcaption class="demo-cap"><b>rviz</b></figcaption>
       </figure>
       <figure class="shot">
         <img src="images/soc_battery.jpg" alt="Battery / state-of-charge" onerror="this.classList.add('missing')">
         <figcaption class="demo-cap"><b>soc_battery</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/field_photo_1.jpeg" alt="Robot in the field" onerror="this.classList.add('missing')">
+        <figcaption class="demo-cap"><b>field_1</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/field_photo_2.jpeg" alt="Robot hardware" onerror="this.classList.add('missing')">
+        <figcaption class="demo-cap"><b>field_2</b></figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/field_photo_3.jpeg" alt="Robot detail" onerror="this.classList.add('missing')">
+        <figcaption class="demo-cap"><b>field_3</b></figcaption>
       </figure>
     </div>
   </div>
@@ -463,7 +508,7 @@
     <p class="lede">Open to ROS 2 navigation and autonomy roles across Germany, the Netherlands, France, Spain, and the UAE.</p>
     <div class="contact-links">
       <a class="btn btn-primary" href="mailto:2190anirban@gmail.com">Email me</a>
-      <a class="btn btn-ghost" href="https://linkedin.com/in/anirban2190" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn btn-ghost" href="https://linkedin.com/in/2190anirban" target="_blank" rel="noopener">LinkedIn</a>
       <a class="btn btn-ghost" href="https://github.com/anirban2190/portfolio" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
