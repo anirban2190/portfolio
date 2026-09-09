@@ -1,15 +1,3 @@
-# Debugging a mirrored point cloud: extrinsics applied twice between driver config and URDF
-
-*Draft for ROS Discourse — category suggestion: General / Localization / Sensor Integration*
-
-> **Before posting — fill in or verify the items marked `[CHECK]`.** I've written this from the
-> outline of your CV, so the shape of the story is right but several specifics are placeholders.
-> Getting one of them wrong in public is worse than not posting.
->
-> **IP safety:** there is no employer code here, no config file contents, no product details, and
-> no customer named. The setup is described generically because the bug is generic. Keep it that
-> way — if you add a snippet, retype it as a minimal reproduction rather than pasting your actual
-> config.
 
 ---
 
@@ -93,29 +81,5 @@ everything else, and it's what people go to look at when they want to know where
 - **Decide where extrinsics live before you have two of them,** and write it down. This is a
   five-minute convention that prevents a multi-day bug.
 
-## Question for the community
 
-Does anyone enforce this structurally rather than by convention? I've considered a startup check
-that compares the driver's configured extrinsic against the corresponding URDF joint and refuses to
-launch if both are non-identity — but I'd rather adopt an existing pattern than invent one. Curious
-how other people handle it, particularly on robots with several sensors that each ship their own
-extrinsic config.
 
----
-
-### Notes before you post (delete this section)
-
-- **Title alternatives**, depending on how discoverable you want it:
-  - *"Mirrored point cloud from duplicated extrinsics — a TF debugging story"* (searchable)
-  - *"A valid TF tree can still be wrong: extrinsics declared twice"* (better hook)
-- **Where it goes:** ROS Discourse, General category, or the Localization/Navigation subcategory
-  if your instance has one.
-- **Reuse this three ways** — that's the point of writing it:
-  1. Your interview anchor story. It's already structured as symptom → investigation → root cause →
-     generalisation, which is exactly how you should tell it out loud.
-  2. The README for a TF-consistency checker, if you build the tool.
-  3. A shortened LinkedIn post (cut to the fix and the three lessons, link to the Discourse thread).
-- **Tone check:** the closing question is doing real work. It invites replies, which is what makes
-  a Discourse thread visible, and it signals you're asking rather than lecturing. Keep it.
-- **Don't** name your employer, the customer, the product, or the application. The post is stronger
-  as a generic sensor-integration lesson and safer for you.
