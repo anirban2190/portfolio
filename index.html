@@ -460,55 +460,76 @@
 
     <div class="job">
       <div class="meta">
-        <div class="role">// slam · localization</div>
-        <div class="org"><span class="todo">TODO title</span></div>
-        <div class="when"><span class="todo">TODO stack</span></div>
+        <div class="role">// localization · odometry</div>
+        <div class="org">Robot woke up believing it was somewhere else</div>
+        <div class="when">Python (launch) · YAML · ros2_control</div>
       </div>
       <div>
-        <h3><span class="todo">TODO headline — one line naming the real cause</span></h3>
+        <h3>A pose persistence feature that saved bad poses</h3>
         <ul>
-          <li><b>Symptom.</b> <span class="todo">TODO — map smearing, double walls, pose jumps, heading
-            drift over a long run, loss in one part of the site? Say where and when it happened.</span></li>
-          <li><b>Why it hid.</b> <span class="todo">TODO — drift degrades gradually, so it reads as "the
-            map is a bit off" until it isn't. What made it hard to catch?</span></li>
-          <li><b>Investigation.</b> <span class="todo">TODO — rosbag replay, scan-match score over time,
-            map vs ground truth overlay, odom→map correction magnitude?</span></li>
-          <li><b>Root cause.</b> <span class="todo">TODO — the one that actually happened. Common ones:
-            geometric degeneracy in featureless rows; wheel odometry over-trusted in the EKF so slip
-            propagated into the map; loop closure never firing; scan/odom timestamp misalignment; scan
-            distortion during rotation on rough ground.</span></li>
-          <li><b>Fix.</b> <span class="todo">TODO — what you changed, and what you deliberately chose not
-            to do. The rejected option is what shows judgment.</span></li>
-          <li><b>Generalises.</b> <span class="todo">TODO — the one sentence you'd tell someone hitting
-            this.</span></li>
+          <li><b>Symptom.</b> On startup the TF tree sat completely frozen for 30+ seconds before the
+            robot would move. Once running, TF analysis showed the <code>map→odom</code> correction
+            carrying roughly <b>1.9 m of translation and 15&deg; of rotation</b> — the localizer fighting
+            a continuous offset rather than settling.</li>
+          <li><b>Why it hid.</b> Nothing failed. AMCL seeded itself from a pose file written by the
+            previous run, so every startup looked normal — the robot simply, silently, began each
+            session convinced it was standing somewhere it wasn't, and spent the first half minute
+            arguing with the scan data.</li>
+          <li><b>Investigation.</b> Watched the <code>map→odom</code> correction magnitude rather than
+            the final pose, which separated "localization is wrong" from "odometry is wrong". Then read
+            the <code>diff_drive_controller</code> configuration line by line.</li>
+          <li><b>Root cause.</b> Two faults compounding. The controller ran with
+            <code>open_loop: true</code>, so odometry came from commanded velocity rather than encoder
+            feedback — no slip, no load, no reality. On top of that a
+            <code>left_wheel_radius_multiplier: 1.2</code> fudge factor introduced a systematic
+            left-right asymmetry, which integrates into heading drift. Separately, the pose-persistence
+            layer had <code>covariance_threshold: 10.0</code> — so loose that it happily saved poses
+            AMCL had never converged on, and fed them back at the next boot.</li>
+          <li><b>Fix.</b> Rewrote <code>full_nav.launch.py</code> to inject a known initial pose straight
+            into AMCL through <code>param_substitutions</code> and <code>RewrittenYaml</code>, with
+            <code>initial_pose_x/y/yaw</code> exposed as launch arguments — removing the startup
+            dependency on the saved-pose file entirely. Tightened the persistence threshold from
+            <b>10.0 to 0.1</b> so an unconverged pose can never be written. I deliberately kept the
+            persistence feature rather than deleting it: the mechanism was sound, the gate was not.</li>
+          <li><b>Generalises.</b> A persistence layer that stores unvalidated state is worse than no
+            persistence at all — it converts a transient failure into one that survives a reboot. Gate
+            what you save on the estimator's own confidence, not on whether a value exists.</li>
         </ul>
       </div>
     </div>
 
     <div class="job">
       <div class="meta">
-        <div class="role">// autonomy · docking</div>
-        <div class="org"><span class="todo">TODO title</span></div>
-        <div class="when"><span class="todo">TODO stack</span></div>
+        <div class="role">// perception · tooling</div>
+        <div class="org">Fixing code that was never running</div>
+        <div class="when">Python · ROS 2 · colcon</div>
       </div>
       <div>
-        <h3><span class="todo">TODO headline</span></h3>
+        <h3>Two false floors under one phantom obstacle</h3>
         <ul>
-          <li><b>Symptom.</b> <span class="todo">TODO — approached the wrong spot, stopped short, came in
-            at an angle, missed the contacts, or succeeded intermittently? Give the success rate if you
-            know it; intermittent is the better story.</span></li>
-          <li><b>Why it hid.</b> <span class="todo">TODO — docking failures look like navigation failures.
-            If you chased the wrong subsystem first, say so; the wrong turn makes the rest more
-            believable.</span></li>
-          <li><b>Investigation.</b> <span class="todo">TODO</span></li>
-          <li><b>Root cause.</b> <span class="todo">TODO — likely candidates for your stack: map-frame
-            drift leaving the stored dock pose stale; an offset between the detected retroreflector
-            centroid and the actual contact point; goal referenced to the wrong chassis frame; open-loop
-            final approach compounding heading error over the last half metre; Nav2 goal tolerance wider
-            than the dock's mechanical capture window.</span></li>
-          <li><b>Fix.</b> <span class="todo">TODO — if you moved from a map-frame goal to a
-            sensor-relative closed-loop approach, say that plainly, and name the language.</span></li>
-          <li><b>Generalises.</b> <span class="todo">TODO</span></li>
+          <li><b>Symptom.</b> The robot halted roughly <b>2.06 m</b> short of a corridor entrance,
+            reporting a confirmed obstacle where the corridor was empty. I had already reduced the
+            obstacle lookahead to 1.2 m, and the stop distance hadn't moved.</li>
+          <li><b>Why it hid.</b> The source was correct. Reading the file I had edited told me nothing
+            was wrong, which is the most convincing kind of wrong.</li>
+          <li><b>Investigation.</b> Grepped the <em>installed</em> copy rather than the source — the
+            lookahead there was still <b>1.5 m</b>. The edits had never been rebuilt into the install
+            directory. After rebuilding with <code>--symlink-install</code>, the stop persisted at the
+            same range, which meant a second, independent obstacle-check path with its own threshold
+            near 2.05 m. Echoing <code>/scan</code> then exposed a third layer: the Mid-360's
+            non-repetitive scan pattern produces sparse, flickering <code>.inf</code> values across
+            angular bins, so the apparent obstacle bearing wandered <b>&plusmn;30 cm at constant
+            range</b> — enough to defeat the debounce logic.</li>
+          <li><b>Root cause.</b> Stale install artifacts masking every edit, a duplicated threshold in a
+            second code path, and a sensor characteristic the detection logic never accounted for.
+            Three separate causes producing one symptom.</li>
+          <li><b>Fix.</b> Rebuilt with <code>colcon build --symlink-install</code> so source edits take
+            effect without a reinstall, consolidated the duplicated threshold, and aggregated 3–5 scans
+            per angular bin — taking the minimum over a short deque — to stabilise wall returns before
+            anything downstream consumed them.</li>
+          <li><b>Generalises.</b> Verify the binary you're running, not the source you edited. And when
+            a fix produces <em>no change at all</em>, that's rarely a tuning problem — it's evidence the
+            change never reached the running system, or that something else owns the behaviour.</li>
         </ul>
       </div>
     </div>
