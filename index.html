@@ -162,6 +162,12 @@
   .card p{color:var(--muted);font-size:.92rem}
   .card p b{color:var(--text);font-weight:500}
 
+  /* SOLVED / CASE STUDIES — added */
+  code{font-family:'JetBrains Mono',monospace;font-size:.9em;color:var(--cyan)}
+  .todo{background:rgba(242,179,68,.14);color:var(--amber);
+        border:1px dashed var(--amber);border-radius:4px;
+        padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:.86em}
+
   /* SKILLS */
   .skill-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
   .skill-group h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan);
@@ -231,6 +237,7 @@
       <a href="#about">/about</a>
       <a href="#experience">/experience</a>
       <a href="#work">/work</a>
+      <a href="#solved">/solved</a>
       <a href="#skills">/skills</a>
       <a href="#demos">/demos</a>
       <a href="#contact">/contact</a>
@@ -404,6 +411,125 @@
   </div>
 </section>
 
+<!-- SOLVED -->
+<section id="solved">
+  <div class="wrap">
+    <div class="sec-label">/solved</div>
+    <h2 class="sec-title">Three problems that didn't throw an error</h2>
+    <p class="lede" style="margin-bottom:34px">The expensive bugs aren't the ones that crash. They're the ones where every
+      diagnostic you own reports success — and the robot is still wrong. Each of these cost days in
+      the field before it cost minutes to fix.</p>
+
+    <div class="job">
+      <div class="meta">
+        <div class="role">// perception · tf</div>
+        <div class="org">Mirrored point cloud</div>
+        <div class="when"><span class="todo">TODO stack</span> · URDF · Livox driver</div>
+      </div>
+      <div>
+        <h3>A valid TF tree that was completely wrong</h3>
+        <ul>
+          <li><b>Symptom.</b> Cloud density and range looked correct, but obstacles landed on the wrong
+            side of the robot — a wall on the left appeared in the costmap on the right, cleanly
+            mirrored about the <span class="todo">TODO axis</span>. On a 1.52 m × 1.44 m footprint in
+            corridors under 30 cm clearance, not a cosmetic problem.</li>
+          <li><b>Why it hid.</b> Nothing errored. No TF timeouts, no dropped messages, no warnings.
+            Every node was genuinely healthy.</li>
+          <li><b>Investigation.</b> Captured a <b>rosbag</b> in the failing condition to stop debugging a
+            live robot in a field. Visualised points in the <b>sensor frame</b> rather than the map
+            frame — raw data was clean, which moved the fault out of the driver and into the transform
+            chain in one step. Walked the tree with <code>view_frames</code> and <code>tf2_echo</code>:
+            connected, no loops, no missing links. Structurally valid, which is exactly why nothing had
+            complained.</li>
+          <li><b>Root cause.</b> The sensor extrinsic was declared twice — once in the Livox driver
+            configuration, once as a URDF joint — and both were applied, so the mounting rotation
+            composed with itself. <span class="todo">TODO arithmetic: e.g. a 180° yaw declared in both
+            places nets 360°; 90° twice gives 180°. The numbers explain why it mirrored rather than
+            merely rotated.</span></li>
+          <li><b>Fix.</b> One owner for the extrinsic: kept the
+            <span class="todo">TODO URDF or driver?</span> authoritative and zeroed the other. The real
+            fix was the convention, not the value.</li>
+          <li><b>Generalises.</b> A valid TF tree is not a correct TF tree — <code>view_frames</code>
+            checks connectivity, nothing more. Any driver shipping its own extrinsic config becomes a
+            duplication risk the moment that sensor also appears in a URDF. And a clean <i>mirror</i> is
+            the fingerprint of a doubled transform, where an odd-angle rotation usually means a merely
+            wrong one.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="meta">
+        <div class="role">// slam · localization</div>
+        <div class="org"><span class="todo">TODO title</span></div>
+        <div class="when"><span class="todo">TODO stack</span></div>
+      </div>
+      <div>
+        <h3><span class="todo">TODO headline — one line naming the real cause</span></h3>
+        <ul>
+          <li><b>Symptom.</b> <span class="todo">TODO — map smearing, double walls, pose jumps, heading
+            drift over a long run, loss in one part of the site? Say where and when it happened.</span></li>
+          <li><b>Why it hid.</b> <span class="todo">TODO — drift degrades gradually, so it reads as "the
+            map is a bit off" until it isn't. What made it hard to catch?</span></li>
+          <li><b>Investigation.</b> <span class="todo">TODO — rosbag replay, scan-match score over time,
+            map vs ground truth overlay, odom→map correction magnitude?</span></li>
+          <li><b>Root cause.</b> <span class="todo">TODO — the one that actually happened. Common ones:
+            geometric degeneracy in featureless rows; wheel odometry over-trusted in the EKF so slip
+            propagated into the map; loop closure never firing; scan/odom timestamp misalignment; scan
+            distortion during rotation on rough ground.</span></li>
+          <li><b>Fix.</b> <span class="todo">TODO — what you changed, and what you deliberately chose not
+            to do. The rejected option is what shows judgment.</span></li>
+          <li><b>Generalises.</b> <span class="todo">TODO — the one sentence you'd tell someone hitting
+            this.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="meta">
+        <div class="role">// autonomy · docking</div>
+        <div class="org"><span class="todo">TODO title</span></div>
+        <div class="when"><span class="todo">TODO stack</span></div>
+      </div>
+      <div>
+        <h3><span class="todo">TODO headline</span></h3>
+        <ul>
+          <li><b>Symptom.</b> <span class="todo">TODO — approached the wrong spot, stopped short, came in
+            at an angle, missed the contacts, or succeeded intermittently? Give the success rate if you
+            know it; intermittent is the better story.</span></li>
+          <li><b>Why it hid.</b> <span class="todo">TODO — docking failures look like navigation failures.
+            If you chased the wrong subsystem first, say so; the wrong turn makes the rest more
+            believable.</span></li>
+          <li><b>Investigation.</b> <span class="todo">TODO</span></li>
+          <li><b>Root cause.</b> <span class="todo">TODO — likely candidates for your stack: map-frame
+            drift leaving the stored dock pose stale; an offset between the detected retroreflector
+            centroid and the actual contact point; goal referenced to the wrong chassis frame; open-loop
+            final approach compounding heading error over the last half metre; Nav2 goal tolerance wider
+            than the dock's mechanical capture window.</span></li>
+          <li><b>Fix.</b> <span class="todo">TODO — if you moved from a map-frame goal to a
+            sensor-relative closed-loop approach, say that plainly, and name the language.</span></li>
+          <li><b>Generalises.</b> <span class="todo">TODO</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:34px">
+      <div class="sec-label" style="margin-bottom:14px">// how, not just what</div>
+      <div class="chips">
+        <span class="chip">rosbag2 replay</span>
+        <span class="chip">TF tree analysis</span>
+        <span class="chip">sensor-frame vs map-frame isolation</span>
+        <span class="chip">message-flow tracing</span>
+        <span class="chip">QoS profile inspection</span>
+        <span class="chip">Foxglove Studio</span>
+        <span class="chip">RViz</span>
+        <span class="chip">Gazebo reproduction</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- SKILLS -->
 <section id="skills">
   <div class="wrap">
@@ -515,7 +641,7 @@
     <div class="contact-links">
       <a class="btn btn-primary" href="mailto:2190anirban@gmail.com">Email me</a>
       <a class="btn btn-ghost" href="https://linkedin.com/in/2190anirban" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn btn-ghost" href="https://github.com/anirban2190/portfolio" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/anirban2190" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 </section>
