@@ -119,7 +119,7 @@
     border:1px solid var(--line);background:#000;
   }
   .photo-frame::before{
-    content:"images/nav_demo.gif";position:absolute;inset:0;display:flex;
+    content:"Navigation demo";position:absolute;inset:0;display:flex;
     align-items:center;justify-content:center;padding:16px;text-align:center;
     font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--faint);
     background:
@@ -162,11 +162,8 @@
   .card p{color:var(--muted);font-size:.92rem}
   .card p b{color:var(--text);font-weight:500}
 
-  /* SOLVED / CASE STUDIES — added */
+  /* SOLVED / CASE STUDIES */
   code{font-family:'JetBrains Mono',monospace;font-size:.9em;color:var(--cyan)}
-  .todo{background:rgba(242,179,68,.14);color:var(--amber);
-        border:1px dashed var(--amber);border-radius:4px;
-        padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:.86em}
 
   /* SKILLS */
   .skill-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
@@ -335,8 +332,8 @@
       <div>
         <h3>Sole owner — ROS 2 autonomy stack, agricultural AMR</h3>
         <ul>
-          <li>Designed and maintain the <b>full Nav2 navigation stack</b>: costmaps, planners, controllers, recovery behaviors, and behavior trees.</li>
-          <li>Built <b>EKF sensor fusion</b> (robot_localization) and tuned AMCL to eliminate localization drift in a structured field environment.</li>
+          <li>Configured and maintain the <b>Nav2-based navigation stack</b>: costmaps, planners, controllers, recovery behaviors, and behavior trees.</li>
+          <li>Integrated <b>EKF sensor fusion</b> with robot_localization and tuned AMCL to improve localization in a structured field environment.</li>
           <li>Integrated a <b>Livox Mid-360 LiDAR</b> end to end — URDF, transforms, point-cloud-to-laserscan, QoS, and intensity-based retroreflector localization experiments.</li>
           <li>Wrote the <b>CAN / CANopen</b> interface over SocketCAN to drive motor controllers, and diagnosed encoder, odometry, and gain-tuning issues at the firmware level.</li>
           <li>Containerized the stack with <b>Docker</b> for reproducible deployment on the robot.</li>
@@ -355,8 +352,8 @@
         <ul>
           <li>Built ROS 2 nodes for a <b>fleet of mecanum-wheel AMRs</b>, focused on inter-robot communication and coordination.</li>
           <li>Modeled and validated <b>forward / inverse kinematics</b> in MATLAB, then verified behavior in Gazebo before hardware.</li>
-          <li>Wrote a Python <b>SocketCAN driver</b> for real-time motor commands, velocity feedback, and fault monitoring.</li>
-          <li>Evaluated <b>DDS vs Fast RTPS</b> middleware for throughput, latency, and message-drop behavior across the fleet network.</li>
+          <li>Wrote a Python <b>SocketCAN driver</b> for motor commands, velocity feedback, and fault monitoring.</li>
+          <li>Evaluated <b>ROS 2 middleware configurations</b> for throughput, latency, and message delivery across the fleet network.</li>
         </ul>
       </div>
     </div>
@@ -368,44 +365,42 @@
   <div class="wrap">
     <div class="sec-label">/work</div>
     <h2 class="sec-title">The autonomy stack, by subsystem</h2>
-    <p class="lede" style="margin-bottom:34px">Each block below is a problem I've owned on a real robot in the field — not a tutorial.</p>
+    <p class="lede" style="margin-bottom:34px">Selected integration and debugging work across mobile-robot subsystems.</p>
     <div class="cards">
       <div class="card">
         <div class="tag">// localization</div>
-        <h3>Drift-free pose estimation</h3>
-        <p>Diagnosed AMCL using only <b>~2% of available scan beams</b>, fused wheel odometry and IMU through an EKF, and injected fixed initial poses at launch for repeatable startup.</p>
+        <h3>Localization and startup consistency</h3>
+        <p>Tuned AMCL scan parameters, integrated wheel odometry and IMU through <b>robot_localization</b>, and added explicit initial-pose configuration for repeatable startup from a known location.</p>
       </div>
       <div class="card">
         <div class="tag">// navigation</div>
-        <h3>Tight-corridor path planning</h3>
-        <p>Resolved failures where the robot's footprint diagonal exceeded corridor width — corrected inflation radius, footprint, and goal-tolerance configs across full <b>Nav2 param rewrites</b>.</p>
+        <h3>Navigation through constrained corridors</h3>
+        <p>Tuned the <b>1.52 m × 1.44 m footprint</b>, costmap inflation, planner, controller, and goal settings. Passage depends on robot orientation and the space swept during a turn; parameter changes cannot create physical clearance.</p>
       </div>
       <div class="card">
         <div class="tag">// perception</div>
-        <h3>LiDAR integration &amp; SLAM</h3>
-        <p>Fixed point-cloud mirroring from double-applied transforms, repaired <b>slam_toolbox</b> scan matching, and resolved QoS mismatches between perception and Nav2 nodes.</p>
+        <h3>LiDAR integration and mapping</h3>
+        <p>Resolved point-cloud misalignment involving <b>duplicated extrinsic transforms</b>, investigated slam_toolbox scan matching, and corrected QoS mismatches between perception and navigation nodes.</p>
       </div>
       <div class="card">
         <div class="tag">// control &amp; bus</div>
-        <h3>CAN motor control</h3>
-        <p>Built the <b>SocketCAN / CANopen</b> bridge, calibrated odometry against commanded motion, and tuned velocity-controller gains on ODrive Pro controllers.</p>
+        <h3>CAN motor interfaces</h3>
+        <p>Built <b>SocketCAN interfaces</b> for motor commands and feedback, worked with CAN/CANopen devices, and calibrated wheel parameters to address odometry drift. Controller-specific work included velocity-gain tuning on ODrive Pro.</p>
       </div>
-
       <div class="card">
         <div class="tag">// middleware</div>
-        <h3>Fleet communication &amp; DDS</h3>
-        <p>For a multi-robot system, the hard part isn't one robot — it's getting many to agree on state without a central bottleneck. I built the ROS 2 layer on <b>DDS / Fast RTPS</b>, comparing reliability and message-drop thresholds (DDS holding past larger payloads where Fast RTPS degraded earlier) and weighing a <b>centralized fleet-manager</b> topology against fully <b>decentralized</b> coordination where each robot acts on local information alone.</p>
+        <h3>Fleet communication</h3>
+        <p>Built ROS 2 communication for multiple robots and investigated delivery, latency, and payload handling under different middleware configurations. Compared centralized fleet management with decentralized coordination. <b>Fast DDS, formerly Fast RTPS, implements DDS</b>; performance comparisons need named implementations and matching test conditions.</p>
       </div>
       <div class="card">
         <div class="tag">// drivers</div>
-        <h3>Deterministic control over CAN</h3>
-        <p>The motor's fast loop runs on the controller, so what bites the robot isn't raw command delay — it's <b>jitter on the feedback path</b>. Variable arrival time corrupts the odometry <b>dt</b> (drift you can't blame on the sensors) and eats control phase margin at speed. I attack the variance — RT-friendly scheduling, native CAN over USB adapters, tight loop timing — and timestamp encoder feedback at the source, not at receipt.</p>
+        <h3>CAN feedback and timing</h3>
+        <p>Worked on motor-command delivery, encoder feedback, and timing in the ROS 2–SocketCAN path. For odometry, the relevant checks include <b>sample timing, feedback age, dropped messages, and calibration</b>. A CAN interface alone does not establish an end-to-end timing guarantee.</p>
       </div>
-
       <div class="card">
-        <div class="tag">// safety &amp; integration</div>
-        <h3>Fused multi-LiDAR + PLC safety layer</h3>
-        <p>Concatenated point clouds from multiple LiDARs into one unified <b>360° safety field</b> — calibrated extrinsics, TF-synced and voxel-downsampled — so no single sensor leaves a blind spot. Wired the fused detection into a <b>safety PLC</b> over fieldbus (Modbus / EtherNet-IP / OPC-UA) for deterministic, hardware-level protective stops independent of ROS. The same PLC guards the <b>DC bus</b>, clamping regenerative-braking voltage spikes with a brake-resistor interlock to protect the battery.</p>
+        <div class="tag">// hardware integration</div>
+        <h3>Multi-LiDAR perception and PLC interfaces</h3>
+        <p>Worked on multi-LiDAR point-cloud integration and <b>ROS 2–PLC interfaces</b> for robot status and interlocks. Geometric alignment, timestamp alignment, and occlusion each affect usable coverage. The ROS perception path and the hardware protective-stop circuit have different responsibilities and must be described separately.</p>
       </div>
     </div>
   </div>
@@ -415,139 +410,80 @@
 <section id="solved">
   <div class="wrap">
     <div class="sec-label">/solved</div>
-    <h2 class="sec-title">Three problems that didn't throw an error</h2>
-    <p class="lede" style="margin-bottom:34px">The expensive bugs aren't the ones that crash. They're the ones where every
-      diagnostic you own reports success — and the robot is still wrong. Each of these cost days in
-      the field before it cost minutes to fix.</p>
+    <h2 class="sec-title">Three field-debugging investigations</h2>
+    <p class="lede" style="margin-bottom:34px">A running node and a connected TF tree are useful checks, but they do not establish correct robot behavior. These investigations involved geometry, startup state, and the code actually running on the robot.</p>
 
     <div class="job">
       <div class="meta">
         <div class="role">// perception · tf</div>
-        <div class="org">Mirrored point cloud</div>
-        <div class="when"><span class="todo">TODO stack</span> · URDF · Livox driver</div>
+        <div class="org">Point cloud on the wrong side</div>
+        <div class="when">ROS 2 · TF2 · URDF · Livox driver</div>
       </div>
       <div>
-        <h3>A valid TF tree that was completely wrong</h3>
+        <h3>A connected TF tree with incorrect geometry</h3>
         <ul>
-          <li><b>Symptom.</b> Cloud density and range looked correct, but obstacles landed on the wrong
-            side of the robot — a wall on the left appeared in the costmap on the right, cleanly
-            mirrored about the <span class="todo">TODO axis</span>. On a 1.52 m × 1.44 m footprint in
-            corridors under 30 cm clearance, not a cosmetic problem.</li>
-          <li><b>Why it hid.</b> Nothing errored. No TF timeouts, no dropped messages, no warnings.
-            Every node was genuinely healthy.</li>
-          <li><b>Investigation.</b> Captured a <b>rosbag</b> in the failing condition to stop debugging a
-            live robot in a field. Visualised points in the <b>sensor frame</b> rather than the map
-            frame — raw data was clean, which moved the fault out of the driver and into the transform
-            chain in one step. Walked the tree with <code>view_frames</code> and <code>tf2_echo</code>:
-            connected, no loops, no missing links. Structurally valid, which is exactly why nothing had
-            complained.</li>
-          <li><b>Root cause.</b> The sensor extrinsic was declared twice — once in the Livox driver
-            configuration, once as a URDF joint — and both were applied, so the mounting rotation
-            composed with itself. <span class="todo">TODO arithmetic: e.g. a 180° yaw declared in both
-            places nets 360°; 90° twice gives 180°. The numbers explain why it mirrored rather than
-            merely rotated.</span></li>
-          <li><b>Fix.</b> One owner for the extrinsic: kept the
-            <span class="todo">TODO URDF or driver?</span> authoritative and zeroed the other. The real
-            fix was the convention, not the value.</li>
-          <li><b>Generalises.</b> A valid TF tree is not a correct TF tree — <code>view_frames</code>
-            checks connectivity, nothing more. Any driver shipping its own extrinsic config becomes a
-            duplication risk the moment that sensor also appears in a URDF. And a clean <i>mirror</i> is
-            the fingerprint of a doubled transform, where an odd-angle rotation usually means a merely
-            wrong one.</li>
+          <li><b>Symptom.</b> LiDAR returns appeared on the wrong side of the robot after transformation into the navigation frame. The scene looked plausible, but obstacle placement did not match the physical surroundings.</li>
+          <li><b>Investigation.</b> Captured a <b>rosbag2</b> recording and compared the cloud in its declared sensor frame with the transformed view. Inspected the driver configuration, URDF, and transform chain using <code>view_frames</code> and <code>tf2_echo</code>. Connectivity alone did not establish that the coordinates and frame labels agreed.</li>
+          <li><b>Root cause.</b> The mounting transform was applied in the driver path and again through the URDF/TF path. This introduced an extra geometric transformation. A duplicate configuration matters when both stages actually transform the same data; merely publishing the same TF edge twice is a different fault.</li>
+          <li><b>Fix.</b> Removed the duplicate application so the mounting transform was applied once, with the point coordinates and declared frame kept consistent.</li>
+          <li><b>Geometry.</b> Composing two proper rotations produces another rotation. A wrong rotation can put objects on the opposite side in a top-down view, but that appearance does not establish a true reflection or identify a particular axis.</li>
+          <li><b>Lesson.</b> Validate transformed observations against known physical landmarks. A connected tree can still encode the wrong geometry, and a plausible-looking sensor-frame display does not by itself clear the driver of responsibility.</li>
         </ul>
       </div>
     </div>
 
     <div class="job">
       <div class="meta">
-        <div class="role">// localization · odometry</div>
-        <div class="org">Robot woke up believing it was somewhere else</div>
-        <div class="when">Python (launch) · YAML · ros2_control</div>
+        <div class="role">// localization · startup</div>
+        <div class="org">An inappropriate pose reused at startup</div>
+        <div class="when">Python launch · YAML · AMCL · ros2_control</div>
       </div>
       <div>
-        <h3>A pose persistence feature that saved bad poses</h3>
+        <h3>Making the source of the initial pose explicit</h3>
         <ul>
-          <li><b>Symptom.</b> On startup the TF tree sat completely frozen for 30+ seconds before the
-            robot would move. Once running, TF analysis showed the <code>map→odom</code> correction
-            carrying roughly <b>1.9 m of translation and 15&deg; of rotation</b> — the localizer fighting
-            a continuous offset rather than settling.</li>
-          <li><b>Why it hid.</b> Nothing failed. AMCL seeded itself from a pose file written by the
-            previous run, so every startup looked normal — the robot simply, silently, began each
-            session convinced it was standing somewhere it wasn't, and spent the first half minute
-            arguing with the scan data.</li>
-          <li><b>Investigation.</b> Watched the <code>map→odom</code> correction magnitude rather than
-            the final pose, which separated "localization is wrong" from "odometry is wrong". Then read
-            the <code>diff_drive_controller</code> configuration line by line.</li>
-          <li><b>Root cause.</b> Two faults compounding. The controller ran with
-            <code>open_loop: true</code>, so odometry came from commanded velocity rather than encoder
-            feedback — no slip, no load, no reality. On top of that a
-            <code>left_wheel_radius_multiplier: 1.2</code> fudge factor introduced a systematic
-            left-right asymmetry, which integrates into heading drift. Separately, the pose-persistence
-            layer had <code>covariance_threshold: 10.0</code> — so loose that it happily saved poses
-            AMCL had never converged on, and fed them back at the next boot.</li>
-          <li><b>Fix.</b> Rewrote <code>full_nav.launch.py</code> to inject a known initial pose straight
-            into AMCL through <code>param_substitutions</code> and <code>RewrittenYaml</code>, with
-            <code>initial_pose_x/y/yaw</code> exposed as launch arguments — removing the startup
-            dependency on the saved-pose file entirely. Tightened the persistence threshold from
-            <b>10.0 to 0.1</b> so an unconverged pose can never be written. I deliberately kept the
-            persistence feature rather than deleting it: the mechanism was sound, the gate was not.</li>
-          <li><b>Generalises.</b> A persistence layer that stores unvalidated state is worse than no
-            persistence at all — it converts a transient failure into one that survives a reboot. Gate
-            what you save on the estimator's own confidence, not on whether a value exists.</li>
+          <li><b>Symptom.</b> Navigation startup was delayed, and the pose used to initialize localization could disagree with the robot's actual starting location.</li>
+          <li><b>Investigation.</b> Reviewed the saved-pose startup path, its covariance gate, and the <code>diff_drive_controller</code> configuration. The <code>map → odom</code> transform was part of the investigation, but its absolute translation or rotation alone cannot distinguish a localization fault from a normal difference between frame origins.</li>
+          <li><b>Startup issue.</b> The persistence path could reuse an unsuitable initial estimate. Its <code>covariance_threshold</code> setting belonged to that persistence layer; it is not a standard AMCL convergence guarantee.</li>
+          <li><b>Change.</b> Updated <code>full_nav.launch.py</code> to supply an explicit starting pose through <code>RewrittenYaml</code> parameter substitutions, avoiding dependence on the saved file for that startup mode. AMCL's parameter-based path uses <code>set_initial_pose: true</code> and <code>initial_pose.x</code>, <code>initial_pose.y</code>, and <code>initial_pose.yaw</code>. Names such as <code>initial_pose_x</code> can be launch arguments, but must map to AMCL's actual parameter names.</li>
+          <li><b>Scope.</b> An explicit pose is appropriate only when it represents the robot's current position in the selected map. The persistence gate was tightened from <b>10.0 to 0.1</b>, but the meaning depends on the covariance entries and units checked by that code. Low covariance alone cannot establish that a pose is correct.</li>
+          <li><b>Separate odometry finding.</b> With <code>open_loop: true</code>, odometry used commanded motion. The <code>left_wheel_radius_multiplier: 1.2</code> also warranted checking against actual wheel geometry. An incorrect multiplier can change commanded wheel speeds and physical motion; the startup-pose change does not repair either issue.</li>
+          <li><b>Lesson.</b> Treat initialization, persistence, and wheel-odometry calibration as separate concerns. Each needs its own evidence and validation.</li>
         </ul>
       </div>
     </div>
 
     <div class="job">
       <div class="meta">
-        <div class="role">// perception · tooling</div>
-        <div class="org">Fixing code that was never running</div>
-        <div class="when">Python · ROS 2 · colcon</div>
+        <div class="role">// perception · deployment</div>
+        <div class="org">An obstacle check that ignored edits</div>
+        <div class="when">Python · ROS 2 · colcon · LaserScan</div>
       </div>
       <div>
-        <h3>Two false floors under one phantom obstacle</h3>
+        <h3>Tracing the deployed code and the scan data</h3>
         <ul>
-          <li><b>Symptom.</b> The robot halted roughly <b>2.06 m</b> short of a corridor entrance,
-            reporting a confirmed obstacle where the corridor was empty. I had already reduced the
-            obstacle lookahead to 1.2 m, and the stop distance hadn't moved.</li>
-          <li><b>Why it hid.</b> The source was correct. Reading the file I had edited told me nothing
-            was wrong, which is the most convincing kind of wrong.</li>
-          <li><b>Investigation.</b> Grepped the <em>installed</em> copy rather than the source — the
-            lookahead there was still <b>1.5 m</b>. The edits had never been rebuilt into the install
-            directory. After rebuilding with <code>--symlink-install</code>, the stop persisted at the
-            same range, which meant a second, independent obstacle-check path with its own threshold
-            near 2.05 m. Echoing <code>/scan</code> then exposed a third layer: the Mid-360's
-            non-repetitive scan pattern produces sparse, flickering <code>.inf</code> values across
-            angular bins, so the apparent obstacle bearing wandered <b>&plusmn;30 cm at constant
-            range</b> — enough to defeat the debounce logic.</li>
-          <li><b>Root cause.</b> Stale install artifacts masking every edit, a duplicated threshold in a
-            second code path, and a sensor characteristic the detection logic never accounted for.
-            Three separate causes producing one symptom.</li>
-          <li><b>Fix.</b> Rebuilt with <code>colcon build --symlink-install</code> so source edits take
-            effect without a reinstall, consolidated the duplicated threshold, and aggregated 3–5 scans
-            per angular bin — taking the minimum over a short deque — to stabilise wall returns before
-            anything downstream consumed them.</li>
-          <li><b>Generalises.</b> Verify the binary you're running, not the source you edited. And when
-            a fix produces <em>no change at all</em>, that's rarely a tuning problem — it's evidence the
-            change never reached the running system, or that something else owns the behaviour.</li>
+          <li><b>Symptom.</b> The robot stopped near a corridor entrance, and reducing a lookahead setting in the source did not change the observed stop.</li>
+          <li><b>Deployment finding.</b> The installed copy still contained <b>1.5 m</b> while the edited source contained <b>1.2 m</b>. The source edit had not reached the deployed copy. Rebuilding addressed that mismatch; an unchanged stop after rebuilding also required investigating other active checks.</li>
+          <li><b>Logic finding.</b> A separate obstacle-check path had its own threshold. Consolidating duplicated settings addressed competing configuration, but stop distance alone was insufficient to identify which condition triggered.</li>
+          <li><b>Scan finding.</b> The projected scan contained angular bins without a retained point. With <code>use_inf</code> enabled, pointcloud_to_laserscan represents those bins as <code>+inf</code>. Sparse sampling and projection filters can leave bins empty; an infinite value is not a finite obstacle detection and does not establish that the space is clear.</li>
+          <li><b>Changes.</b> Rebuilt with <code>colcon build --symlink-install</code>, consolidated the duplicated threshold, and used a <b>3–5-scan minimum window</b> to retain intermittent finite returns. Symlink installation links files where supported; compiled changes still need rebuilding and a running Python process still needs restarting to load edited code.</li>
+          <li><b>Filtering limit.</b> A minimum window preserves the closest return, including a false close return. It is not an outlier-rejection filter. Historical observations also need a bounded lifetime and, when the robot moves, transformation into a consistent frame before accumulation. Missing observations need an explicit policy.</li>
+          <li><b>Lesson.</b> Confirm the active installation and the condition issuing the stop. Evaluate temporal filtering separately for false stops, genuine obstacles, moving scenes, and the time needed to clear old returns.</li>
         </ul>
       </div>
     </div>
 
     <div style="margin-top:34px">
-      <div class="sec-label" style="margin-bottom:14px">// how, not just what</div>
+      <div class="sec-label" style="margin-bottom:14px">// diagnostic tools</div>
       <div class="chips">
         <span class="chip">rosbag2 replay</span>
-        <span class="chip">TF tree analysis</span>
-        <span class="chip">sensor-frame vs map-frame isolation</span>
+        <span class="chip">TF inspection</span>
+        <span class="chip">frame consistency</span>
         <span class="chip">message-flow tracing</span>
-        <span class="chip">QoS profile inspection</span>
-        <span class="chip">Foxglove Studio</span>
+        <span class="chip">QoS inspection</span>
         <span class="chip">RViz</span>
-        <span class="chip">Gazebo reproduction</span>
+        <span class="chip">deployed-code inspection</span>
       </div>
     </div>
-
   </div>
 </section>
 
